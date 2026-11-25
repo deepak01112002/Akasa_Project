@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: taskflow
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: taskflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - taskflow_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/taskflow
+      DB_USER: taskflow
+      DB_PASSWORD: taskflow
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to a random string of at least 32 bytes in .env}
+      JWT_EXPIRY_SECONDS: ${JWT_EXPIRY_SECONDS:-3600}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+volumes:
+  taskflow_data:
