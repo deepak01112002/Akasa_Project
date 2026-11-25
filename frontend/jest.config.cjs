@@ -1,0 +1,1 @@
+module.exports = { testEnvironment: 'jsdom', setupFiles: ['<rootDir>/src/test-setup.cjs'], transform: { '^.+\\.[jt]sx?$': 'babel-jest' }, moduleNameMapper: { '\\.(css)$': '<rootDir>/src/test-style.cjs' } }
